@@ -2,7 +2,6 @@ package org.viyk;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
-import io.quarkus.hibernate.orm.rest.data.panache.PanacheEntityResource;
 import io.quarkus.panache.common.Page;
 
 import javax.persistence.*;
@@ -59,6 +58,19 @@ public class StudentResource {
         }
         student.enroll(course);
         course.addStudent(student);
+    }
+
+    @DELETE
+    @Path("/{id}/courses/{course_id}")
+    @Transactional
+    public void optOutCourse(@PathParam("id") String id, @PathParam("course_id") String course_id) {
+        Student student = Student.findById(id);
+        Course course = Course.findById(course_id);
+        if (student == null || course == null) {
+            throw new NotFoundException();
+        }
+        student.deleteEnroll(course);
+        course.removeStudent(student);
     }
 
     @POST
@@ -124,7 +136,7 @@ class Student extends PanacheEntityBase {
     }
 
     @Transactional
-    public void delete_enroll(Course course) {
+    public void deleteEnroll(Course course) {
         courses.removeIf(x-> x.id.equals(course.id));
         this.persist();
     }
