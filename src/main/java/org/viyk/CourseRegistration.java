@@ -1,16 +1,19 @@
 package org.viyk;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 
-@Path("/hello")
+@Path("")
 public class CourseRegistration {
+    @Path("enroll/{courseId}")
+    @PUT
+    public void enroll(String courseId) {
 
-    @GET
-    @Produces(MediaType.TEXT_PLAIN)
-    public String hello() {
-        return "Hello RESTEasy";
+    }
+
+    @Path("leave/{courseId}")
+    @DELETE
+    public void leave(String courseId) {
+
     }
 }
