@@ -1,20 +1,82 @@
 package org.viyk;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
-import io.quarkus.hibernate.orm.rest.data.panache.PanacheEntityResource;
 
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.Id;
-import javax.persistence.ManyToMany;
+import javax.persistence.*;
 import javax.transaction.Transactional;
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
-import javax.ws.rs.Path;
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import java.net.URI;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Path("/course")
-public interface CourseResource extends PanacheEntityResource<Course, String> {
+@Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
+public class CourseResource {
+    @GET
+    public List<Course> list() {
+        return Course.listAll();
+    }
+
+    @GET
+    @Path("/{id}")
+    public Course get(@PathParam("id") String id) {
+        return Course.findById(id);
+    }
+
+    @GET
+    @Path("/{id}/students")
+    public List<String> getStudents(@PathParam("id") String id) {
+        Course entity = Course.findById(id);
+        if (entity == null) {
+            throw new NotFoundException();
+        }
+        return entity.students.stream().map(x -> x.id).collect(Collectors.toList());
+    }
+
+    @POST
+    @Transactional
+    public Response create(@Valid Course course) {
+        Course entity = Course.findById(course.id);
+        if (entity != null) {
+            return Response.status(Response.Status.CONFLICT).build();
+        }
+        course.persist();
+        return Response.created(URI.create("/course/" + course.id)).build();
+    }
+
+    @PUT
+    @Path("/{id}")
+    @Transactional
+    public Course update(@PathParam("id") String id, Course course) {
+        Course entity = Course.findById(id);
+        if (entity == null) {
+            throw new NotFoundException();
+        }
+
+        if (course.name != null)
+            entity.name = course.name;
+
+        return entity;
+    }
+
+    @DELETE
+    @Path("/{id}")
+    @Transactional
+    public void delete(@PathParam("id") String id) {
+        Course entity = Course.findById(id);
+        if (entity == null) {
+            throw new NotFoundException();
+        }
+        entity.delete();
+    }
 }
 
 @Entity
@@ -34,8 +96,8 @@ class Course extends PanacheEntityBase {
     }
 
     @Transactional
-    public void removeStudent(Student student){
-        students.removeIf(x-> x.id.equals(student.id));
+    public void removeStudent(Student student) {
+        students.removeIf(x -> x.id.equals(student.id));
         this.persist();
     }
 }
