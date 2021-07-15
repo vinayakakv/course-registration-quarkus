@@ -1,40 +1,19 @@
 package org.viyk;
 
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
+import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
+import io.quarkus.hibernate.orm.rest.data.panache.PanacheEntityResource;
 
-class Course {
-    String id;
-    String name;
-}
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.ws.rs.Path;
 
 @Path("/course")
-public class CourseResource {
-    @POST
-    public void create() {
+public interface CourseResource extends PanacheEntityResource<Course, String> {
+}
 
-    }
-
-    @PUT
-    public void update() {
-
-    }
-
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    public void getMany() {
-
-    }
-
-    @Path("/{id}")
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    public void getOne(String id) {
-
-    }
-
-    @DELETE
-    public void delete() {
-
-    }
+@Entity
+class Course extends PanacheEntityBase {
+    @Id
+    public String id;
+    public String name;
 }

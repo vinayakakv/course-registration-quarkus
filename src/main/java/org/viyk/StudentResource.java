@@ -1,41 +1,23 @@
 package org.viyk;
 
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
+import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
+import io.quarkus.hibernate.orm.rest.data.panache.PanacheEntityResource;
 
-class Student {
-    private String id;
-    private String name;
-    private String email;
-}
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.validation.constraints.NotBlank;
+import javax.ws.rs.Path;
 
 @Path("/student")
-public class StudentResource {
-    @POST
-    public void create() {
+public interface StudentResource extends PanacheEntityResource<Student, String> {
+}
 
-    }
-
-    @PUT
-    public void update() {
-
-    }
-
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    public void getMany() {
-
-    }
-
-    @Path("/{id}")
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    public void getOne(String id) {
-
-    }
-
-    @DELETE
-    public void delete() {
-
-    }
+@Entity
+class Student extends PanacheEntityBase {
+    @Id
+    public String id;
+    @NotBlank
+    public String name;
+    @NotBlank
+    public String email;
 }
