@@ -6,10 +6,10 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.stream.Collectors;
 
-@Path("")
+@Path("/enroll")
 public class CourseRegistration {
 
-    @Path("/enroll/{course_id}")
+    @Path("{course_id}")
     @POST
     @Transactional
     public Response enroll(
@@ -26,7 +26,7 @@ public class CourseRegistration {
         return Response.ok().build();
     }
 
-    @Path("/enroll/{course_id}")
+    @Path("{course_id}")
     @DELETE
     @Transactional
     public Response delete_enroll(
@@ -43,7 +43,7 @@ public class CourseRegistration {
         return Response.ok().build();
     }
 
-    @Path("/enroll")
+    @Path("")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getEnrolledCourses(@HeaderParam("student_id") String student_id) {
@@ -54,7 +54,7 @@ public class CourseRegistration {
         return Response.ok(student.courses.stream().map(x -> x.id).collect(Collectors.toList())).build();
     }
 
-    @Path("/enroll/{course_id}")
+    @Path("{course_id}")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getEnrolledStudent(@PathParam("course_id") String course_id) {
@@ -64,5 +64,4 @@ public class CourseRegistration {
         }
         return Response.ok(course.students.stream().map(x -> x.id).collect(Collectors.toList())).build();
     }
-
 }
