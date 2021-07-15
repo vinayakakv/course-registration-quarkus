@@ -39,13 +39,26 @@ public class StudentResource {
     }
 
     @GET
-    @Path("/{id}/course")
+    @Path("/{id}/courses")
     public List<String> getCourses(@PathParam("id") String id) {
         Student entity = Student.findById(id);
         if (entity == null) {
             throw new NotFoundException();
         }
         return entity.courses.stream().map(x -> x.id).collect(Collectors.toList());
+    }
+
+    @PUT
+    @Path("/{id}/courses/{course_id}")
+    @Transactional
+    public void enrollCourse(@PathParam("id") String id, @PathParam("course_id") String course_id) {
+        Student student = Student.findById(id);
+        Course course = Course.findById(course_id);
+        if (student == null || course == null) {
+            throw new NotFoundException();
+        }
+        student.enroll(course);
+        course.addStudent(student);
     }
 
     @POST
