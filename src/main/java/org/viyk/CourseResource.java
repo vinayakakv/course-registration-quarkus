@@ -2,6 +2,7 @@ package org.viyk;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 
+import javax.annotation.security.RolesAllowed;
 import javax.persistence.*;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
@@ -21,18 +22,21 @@ import java.util.stream.Collectors;
 @Consumes(MediaType.APPLICATION_JSON)
 public class CourseResource {
     @GET
+    @RolesAllowed({"admin", "student"})
     public List<Course> list() {
         return Course.listAll();
     }
 
     @GET
     @Path("/{id}")
+    @RolesAllowed({"admin", "student"})
     public Course get(@PathParam("id") String id) {
         return Course.findById(id);
     }
 
     @GET
     @Path("/{id}/students")
+    @RolesAllowed("admin")
     public List<String> getStudents(@PathParam("id") String id) {
         Course entity = Course.findById(id);
         if (entity == null) {
@@ -43,6 +47,7 @@ public class CourseResource {
 
     @POST
     @Transactional
+    @RolesAllowed("admin")
     public Response create(@Valid Course course) {
         Course entity = Course.findById(course.id);
         if (entity != null) {
@@ -55,6 +60,7 @@ public class CourseResource {
     @PUT
     @Path("/{id}")
     @Transactional
+    @RolesAllowed("admin")
     public Course update(@PathParam("id") String id, Course course) {
         Course entity = Course.findById(id);
         if (entity == null) {
@@ -70,6 +76,7 @@ public class CourseResource {
     @DELETE
     @Path("/{id}")
     @Transactional
+    @RolesAllowed("admin")
     public void delete(@PathParam("id") String id) {
         Course entity = Course.findById(id);
         if (entity == null) {

@@ -7,11 +7,9 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
-import java.util.List;
-import java.util.Optional;
 
 @Entity
-@Table(name="users")
+@Table(name = "users")
 public class User extends PanacheEntityBase {
     @Id
     @GeneratedValue

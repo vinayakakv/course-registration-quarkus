@@ -4,13 +4,16 @@ import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import io.quarkus.panache.common.Page;
 
+import javax.annotation.security.RolesAllowed;
 import javax.persistence.*;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.SecurityContext;
 import java.net.URI;
 import java.util.HashSet;
 import java.util.List;
@@ -22,6 +25,7 @@ import java.util.stream.Collectors;
 @Consumes(MediaType.APPLICATION_JSON)
 public class StudentResource {
     @GET
+    @RolesAllowed("admin")
     public List<Student> list(
             @QueryParam("page") @DefaultValue("0") int pageIndex,
             @QueryParam("size") @DefaultValue("20") int pageSize
@@ -33,16 +37,22 @@ public class StudentResource {
 
     @GET
     @Path("/{id}")
+    @RolesAllowed({"admin", "student"})
     public Student get(@PathParam("id") String id) {
         return Student.findById(id);
     }
 
     @GET
     @Path("/{id}/courses")
-    public List<String> getCourses(@PathParam("id") String id) {
+    @RolesAllowed("student")
+    public List<String> getCourses(@PathParam("id") String id, @Context SecurityContext securityContext) {
         Student entity = Student.findById(id);
         if (entity == null) {
             throw new NotFoundException();
+        }
+        String username = securityContext.getUserPrincipal().getName();
+        if (!entity.id.equals(username)) {
+            throw new ForbiddenException();
         }
         return entity.courses.stream().map(x -> x.id).collect(Collectors.toList());
     }
@@ -50,11 +60,16 @@ public class StudentResource {
     @PUT
     @Path("/{id}/courses/{course_id}")
     @Transactional
-    public void enrollCourse(@PathParam("id") String id, @PathParam("course_id") String course_id) {
+    @RolesAllowed("student")
+    public void enrollCourse(@PathParam("id") String id, @PathParam("course_id") String course_id, @Context SecurityContext securityContext) {
         Student student = Student.findById(id);
         Course course = Course.findById(course_id);
         if (student == null || course == null) {
             throw new NotFoundException();
+        }
+        String username = securityContext.getUserPrincipal().getName();
+        if (!student.id.equals(username)) {
+            throw new ForbiddenException();
         }
         student.enroll(course);
         course.addStudent(student);
@@ -63,11 +78,16 @@ public class StudentResource {
     @DELETE
     @Path("/{id}/courses/{course_id}")
     @Transactional
-    public void optOutCourse(@PathParam("id") String id, @PathParam("course_id") String course_id) {
+    @RolesAllowed("student")
+    public void optOutCourse(@PathParam("id") String id, @PathParam("course_id") String course_id, @Context SecurityContext securityContext) {
         Student student = Student.findById(id);
         Course course = Course.findById(course_id);
         if (student == null || course == null) {
             throw new NotFoundException();
+        }
+        String username = securityContext.getUserPrincipal().getName();
+        if (!student.id.equals(username)) {
+            throw new ForbiddenException();
         }
         student.deleteEnroll(course);
         course.removeStudent(student);
@@ -75,6 +95,7 @@ public class StudentResource {
 
     @POST
     @Transactional
+    @RolesAllowed("admin")
     public Response create(@Valid Student student) {
         Student entity = Student.findById(student.id);
         if (entity != null) {
@@ -82,7 +103,7 @@ public class StudentResource {
         }
         student.persist();
         User user = new User();
-        user.userName = student.email;
+        user.userName = student.id;
         user.password = "";
         user.role = "student";
         user.persist();
@@ -92,6 +113,7 @@ public class StudentResource {
     @PUT
     @Path("/{id}")
     @Transactional
+    @RolesAllowed("admin")
     public Student update(@PathParam("id") String id, Student student) {
         Student entity = Student.findById(id);
         if (entity == null) {
@@ -110,11 +132,14 @@ public class StudentResource {
     @DELETE
     @Path("/{id}")
     @Transactional
+    @RolesAllowed("admin")
     public void delete(@PathParam("id") String id) {
         Student entity = Student.findById(id);
         if (entity == null) {
             throw new NotFoundException();
         }
+        User user = User.find("userName", id).firstResult();
+        user.delete();
         entity.delete();
     }
 }
@@ -142,7 +167,7 @@ class Student extends PanacheEntityBase {
 
     @Transactional
     public void deleteEnroll(Course course) {
-        courses.removeIf(x-> x.id.equals(course.id));
+        courses.removeIf(x -> x.id.equals(course.id));
         this.persist();
     }
 }
