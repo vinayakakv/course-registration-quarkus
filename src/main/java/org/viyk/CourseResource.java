@@ -31,7 +31,11 @@ public class CourseResource {
     @Path("/{id}")
     @RolesAllowed({"admin", "student"})
     public Course get(@PathParam("id") String id) {
-        return Course.findById(id);
+        Course course = Course.findById(id);
+        if (course == null) {
+            throw new NotFoundException();
+        }
+        return course;
     }
 
     @GET

@@ -39,7 +39,11 @@ public class StudentResource {
     @Path("/{id}")
     @RolesAllowed({"admin", "student"})
     public Student get(@PathParam("id") String id) {
-        return Student.findById(id);
+        Student student = Student.findById(id);
+        if (student == null) {
+            throw new NotFoundException();
+        }
+        return student;
     }
 
     @GET
