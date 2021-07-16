@@ -81,6 +81,11 @@ public class StudentResource {
             return Response.status(Response.Status.CONFLICT).build();
         }
         student.persist();
+        User user = new User();
+        user.userName = student.email;
+        user.password = "";
+        user.role = "student";
+        user.persist();
         return Response.created(URI.create("/student/" + student.id)).build();
     }
 
