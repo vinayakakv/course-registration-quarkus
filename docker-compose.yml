@@ -5,9 +5,11 @@ services:
     ports:
       - 5432:5432
     volumes:
-      - ${HOME}/postgres-data/:/var/lib/postgresql/data
+      - ./create.sql:/docker-entrypoint-initdb.d/init.sql
     environment:
-      - POSTGRES_PASSWORD=Pass2020
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=Pass2020!
+      - POSTGRES_DB=course
   api_server:
     image: quarkus/course-registration-jvm
     ports:
