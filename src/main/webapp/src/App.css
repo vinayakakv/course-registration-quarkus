@@ -60,7 +60,7 @@ h1 {
   text-align: center;
 }
 
-h1::first-letter {
+h1:first-letter {
   text-transform: capitalize;
 }
 

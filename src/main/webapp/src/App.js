@@ -23,7 +23,7 @@ function App() {
                 password,
                 role: response.data.role
               });
-              setStatus(`Auth Success: Role ${response.data.role}`)
+              setStatus(`Auth Success: Role ${response.data.role}. Hi ${username}!`)
             }
             catch (err) {
               console.log(err);
