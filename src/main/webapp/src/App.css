@@ -1,0 +1,79 @@
+:root{
+  font-size: 16px;
+}
+
+.App {
+  display: grid;
+  grid-template-columns: 0.4fr 1fr 1fr;
+  grid-template-rows: 1fr auto;
+  padding: 1em;
+  grid-auto-flow: column;
+  gap: 1em;
+  justify-content: center;
+}
+
+.contents {
+  display: contents;
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+}
+
+.status {
+  grid-row: -1;
+}
+
+.column {
+  grid-row: 1;
+}
+
+form, div[role=form] {
+  display: grid;
+  grid-template-columns: auto 70%;
+  max-width: 70%;
+  gap: 1em;
+}
+
+form div {
+  display: contents;
+}
+
+form label {
+  grid-column: 1;
+}
+
+form input {
+  grid-column: 2;
+}
+
+form button {
+  grid-column: span 2;
+  width: 70%;
+  justify-self: center;
+}
+
+
+h1 {
+  text-align: center;
+}
+
+h1::first-letter {
+  text-transform: capitalize;
+}
+
+table {
+  border-collapse: collapse;
+}
+
+td, th {
+  border: 1px solid #999;
+  padding: 0.5rem;
+  text-align: left;
+}
+
+button {
+  padding: 0.5rem;
+}
