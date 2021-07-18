@@ -48,6 +48,8 @@ to set the docker environment from minikube.
 
 Then, for all deployments, set `spec.template.spec.containers[0].imagePullPolicy=Never` to use local images.
 
+Build every docker image as described in above section to make them available to the new docker environment.
+
 Then, `cd` to `kubernetes/` folder, and execute
 ```shell script
 kubectl apply -f .
