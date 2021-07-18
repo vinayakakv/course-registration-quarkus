@@ -35,3 +35,27 @@ Run the containers using:
 ```shell script
 docker-compose up
 ```
+
+## Kubernetes
+
+The kubernetes configuration files in [`kubernetes`](kubernetes/) are generated using [`kompose`](https://kompose.io/).
+
+Before applying them, execute:
+```shell script
+eval $(minikube docker-env)
+```
+to set the docker environment from minikube.
+
+Then, for all deployments, set `spec.template.spec.containers[0].imagePullPolicy=Never` to use local images.
+
+Then, `cd` to `kubernetes/` folder, and execute
+```shell script
+kubectl apply -f .
+```
+
+After that, port forward to see the application in action as:
+```shell script
+kubectl port-forward server-<...> 8080:8080
+```
+
+And navigate to <http://localhost:8080/>
